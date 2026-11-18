@@ -1,0 +1,17 @@
+.tools/
+.gradle/
+.kotlin/
+**/build/
+local.properties
+reference_private/
+evidence_private/
+*.jks
+*.keystore
+*.p12
+.env*
+!.env.example
+.idea/
+*.iml
+artifacts/
+*.log
+__pycache__/
