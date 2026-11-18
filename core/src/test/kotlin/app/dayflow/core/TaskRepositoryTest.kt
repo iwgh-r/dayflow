@@ -101,6 +101,6 @@ class TaskRepositoryTest {
     }
 
     @Test fun futureSchemaNeverLoadsAsEmptyData() {
-        assertFailsWith<IllegalArgumentException> { Snapshot(schemaVersion = 2).validate() }
+        assertFailsWith<IllegalArgumentException> { Snapshot(schemaVersion = 3).validate() }
     }
 }

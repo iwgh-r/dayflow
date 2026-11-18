@@ -11,7 +11,6 @@ import java.nio.file.StandardCopyOption
 
 /** One writer per data directory. Invalid input is never silently reset. */
 class JsonFileStore(private val file: File) : SnapshotStore, AutoCloseable {
-    private val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
     private val lockFile: RandomAccessFile
     private val lock: FileLock
     init {
@@ -21,12 +20,12 @@ class JsonFileStore(private val file: File) : SnapshotStore, AutoCloseable {
         catch (error: Exception) { lockFile.close(); throw error }
     }
 
-    override fun load(): Snapshot = if (file.exists()) json.decodeFromString<Snapshot>(file.readText(Charsets.UTF_8)).validate() else Snapshot()
+    override fun load(): Snapshot = if (file.exists()) AppCodec.decode(file.readText(Charsets.UTF_8)) else Snapshot()
 
     override fun save(snapshot: Snapshot) {
         snapshot.validate()
         val pending = File(file.path + ".pending")
-        val bytes = json.encodeToString(snapshot).toByteArray(Charsets.UTF_8)
+        val bytes = AppCodec.encode(snapshot).toByteArray(Charsets.UTF_8)
         pending.outputStream().use { it.write(bytes); it.fd.sync() }
         // Keep the previous committed state, including when replacing fails.
         if (file.exists()) Files.copy(file.toPath(), File(file.path + ".bak").toPath(), StandardCopyOption.REPLACE_EXISTING)
